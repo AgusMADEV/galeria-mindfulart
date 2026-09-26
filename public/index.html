@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Galería Mindful Art</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <h1>Galería Mindful Art</h1>
+            <p>Panel de administración</p>
+        </header>
+
+        <section class="create-album">
+
+            <h2>Crear nuevo álbum</h2>
+
+            <form id="album-form">
+
+                <input
+                    type="text"
+                    id="album-name"
+                    placeholder="Nombre del álbum"
+                    required
+                >
+
+                <button type="submit">
+                    Crear álbum
+                </button>
+
+            </form>
+
+            <p id="message"></p>
+
+        </section>
+
+        <section class="albums-section">
+
+            <h2>Mis álbumes</h2>
+
+            <div id="albums-list">
+                Cargando álbumes...
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="/js/app.js"></script>
+
+</body>
+
+</html>
