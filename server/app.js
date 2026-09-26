@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Archivos públicos
 app.use(express.static(path.join(__dirname, '../public')));
+
 // API
 app.use('/api', indexRoutes);
 
