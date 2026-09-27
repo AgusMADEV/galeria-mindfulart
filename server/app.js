@@ -26,6 +26,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// Galería pública
+app.get('/a/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/gallery.html'));
+});
+
 // Comprobar conexión con la base de datos
 app.get('/api/health', async (req, res) => {
     try {

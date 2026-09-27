@@ -127,6 +127,138 @@ albumForm.addEventListener('submit', async (event) => {
 });
 
 
+const albumSelect = document.getElementById('album-select');
+const fileInput = document.getElementById('file-input');
+const uploadButton = document.getElementById('upload-button');
+const uploadMessage = document.getElementById('upload-message');
+
+
+// ==========================================
+// CARGAR ÁLBUMES EN EL SELECT
+// ==========================================
+
+async function loadAlbumSelect() {
+
+    try {
+
+        const response = await fetch('/api/albums');
+        const data = await response.json();
+
+        if (!data.success) {
+            return;
+        }
+
+        albumSelect.innerHTML = `
+            <option value="">
+                Selecciona un álbum
+            </option>
+        `;
+
+        data.albums.forEach(album => {
+
+            const option = document.createElement('option');
+
+            option.value = album.token;
+            option.textContent = album.name;
+
+            albumSelect.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ==========================================
+// SUBIR ARCHIVOS
+// ==========================================
+
+uploadButton.addEventListener('click', async () => {
+
+    const token = albumSelect.value;
+    const files = fileInput.files;
+
+    if (!token) {
+
+        uploadMessage.textContent =
+            'Selecciona un álbum.';
+
+        return;
+
+    }
+
+    if (!files.length) {
+
+        uploadMessage.textContent =
+            'Selecciona al menos un archivo.';
+
+        return;
+
+    }
+
+    const formData = new FormData();
+
+    for (const file of files) {
+
+        formData.append('files', file);
+
+    }
+
+    uploadMessage.textContent =
+        'Subiendo archivos...';
+
+    uploadButton.disabled = true;
+
+    try {
+
+        const response = await fetch(
+            `/api/albums/${token}/files`,
+            {
+                method: 'POST',
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            uploadMessage.textContent =
+                data.message;
+
+            return;
+
+        }
+
+        uploadMessage.textContent =
+            `${data.files.length} archivo(s) subido(s) correctamente.`;
+
+        fileInput.value = '';
+
+    } catch (error) {
+
+        console.error(error);
+
+        uploadMessage.textContent =
+            'Error al subir los archivos.';
+
+    } finally {
+
+        uploadButton.disabled = false;
+
+    }
+
+});
+
+
+// Cargar álbumes también en el selector
+loadAlbumSelect();
+
 // ==========================================
 // INICIALIZAR
 // ==========================================
