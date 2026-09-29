@@ -6,6 +6,11 @@ const db = require('../config/database');
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const fs = require('fs');
+const { ZipArchive } = require('archiver');
+
+
+const { convertToMp4 } = require('../utils/videoConverter');
 
 const storage = multer.diskStorage({
 
@@ -168,10 +173,11 @@ router.get('/albums/:token', async (req, res) => {
                 id,
                 original_name,
                 stored_name,
+                preview_name,
                 mime_type,
                 size,
                 created_at
-             FROM files
+            FROM files
              WHERE album_id = ?
              ORDER BY created_at ASC`,
             [album.id]
@@ -208,7 +214,6 @@ router.post('/albums/:token/files', upload.array('files', 50), async (req, res) 
 
         const { token } = req.params;
 
-        // Buscar el álbum
         const [albums] = await db.query(
             `SELECT id, name
              FROM albums
@@ -227,7 +232,6 @@ router.post('/albums/:token/files', upload.array('files', 50), async (req, res) 
 
         const album = albums[0];
 
-        // Comprobar que se han recibido archivos
         if (!req.files || req.files.length === 0) {
 
             return res.status(400).json({
@@ -237,22 +241,75 @@ router.post('/albums/:token/files', upload.array('files', 50), async (req, res) 
 
         }
 
-        // Guardar información en MySQL
+        const uploadedFiles = [];
+
         for (const file of req.files) {
+
+            let previewName = null;
+
+            const extension = path
+                .extname(file.originalname)
+                .toLowerCase();
+
+            if (extension === '.mov') {
+
+                previewName =
+                    `${path.basename(file.filename, extension)}.mp4`;
+
+                const inputPath = path.join(
+                    __dirname,
+                    '../../uploads',
+                    file.filename
+                );
+
+                const outputPath = path.join(
+                    __dirname,
+                    '../../uploads',
+                    previewName
+                );
+
+                console.log(
+                    `Convirtiendo ${file.originalname} a MP4...`
+                );
+
+                await convertToMp4(
+                    inputPath,
+                    outputPath
+                );
+
+                console.log(
+                    `Conversión completada: ${previewName}`
+                );
+            }
 
             await db.query(
                 `INSERT INTO files
-                (album_id, original_name, stored_name, mime_type, size)
-                VALUES (?, ?, ?, ?, ?)`,
+                (
+                    album_id,
+                    original_name,
+                    stored_name,
+                    preview_name,
+                    mime_type,
+                    size
+                )
+                VALUES (?, ?, ?, ?, ?, ?)`,
                 [
                     album.id,
                     file.originalname,
                     file.filename,
+                    previewName,
                     file.mimetype,
                     file.size
                 ]
             );
 
+            uploadedFiles.push({
+                originalName: file.originalname,
+                storedName: file.filename,
+                previewName,
+                mimeType: file.mimetype,
+                size: file.size
+            });
         }
 
         res.status(201).json({
@@ -261,12 +318,7 @@ router.post('/albums/:token/files', upload.array('files', 50), async (req, res) 
 
             message: 'Archivos subidos correctamente',
 
-            files: req.files.map(file => ({
-                originalName: file.originalname,
-                storedName: file.filename,
-                mimeType: file.mimetype,
-                size: file.size
-            }))
+            files: uploadedFiles
 
         });
 
@@ -278,6 +330,114 @@ router.post('/albums/:token/files', upload.array('files', 50), async (req, res) 
             success: false,
             message: 'Error al subir los archivos'
         });
+
+    }
+
+});
+
+router.post('/albums/:token/download', async (req, res) => {
+
+    try {
+
+        const { token } = req.params;
+        const { fileIds } = req.body;
+
+        if (!Array.isArray(fileIds) || fileIds.length === 0) {
+
+            return res.status(400).json({
+                success: false,
+                message: 'No se han seleccionado archivos'
+            });
+
+        }
+
+        const [albums] = await db.query(
+            `SELECT id, name
+             FROM albums
+             WHERE token = ?`,
+            [token]
+        );
+
+        if (albums.length === 0) {
+
+            return res.status(404).json({
+                success: false,
+                message: 'Álbum no encontrado'
+            });
+
+        }
+
+        const album = albums[0];
+
+        const [files] = await db.query(
+            `SELECT
+                id,
+                original_name,
+                stored_name
+             FROM files
+             WHERE album_id = ?
+             AND id IN (?)`,
+            [album.id, fileIds]
+        );
+
+        if (files.length === 0) {
+
+            return res.status(404).json({
+                success: false,
+                message: 'No se encontraron los archivos'
+            });
+
+        }
+
+        const archive = new ZipArchive({
+            zlib: {
+                level: 6
+            }
+        });
+
+        archive.on('error', error => {
+            console.error('Error creando ZIP:', error);
+
+            if (!res.headersSent) {
+                res.status(500).end();
+            }
+        });
+
+        const zipName =
+            `${album.name.replace(/[^a-z0-9áéíóúñü ]/gi, '_')}.zip`;
+
+        res.attachment(zipName);
+
+        archive.pipe(res);
+
+        for (const file of files) {
+
+            const filePath = path.join(
+                __dirname,
+                '../../uploads',
+                file.stored_name
+            );
+
+            archive.file(filePath, {
+                name: file.original_name
+            });
+
+        }
+
+        await archive.finalize();
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (!res.headersSent) {
+
+            res.status(500).json({
+                success: false,
+                message: 'Error al crear el ZIP'
+            });
+
+        }
 
     }
 

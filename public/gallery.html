@@ -24,12 +24,48 @@
 
         </header>
 
-        <section id="gallery">
+        <section class="gallery-actions" id="gallery-actions">
 
-            <p>Cargando galería...</p>
+            <div class="selection-info">
+                <span id="selected-count">0</span>
+                <span>seleccionados</span>
+            </div>
+
+            <div class="selection-buttons">
+
+                <button id="select-all-button">
+                    Seleccionar todo
+                </button>
+
+                <button id="download-selected-button" disabled>
+                    Descargar seleccionados
+                </button>
+
+                <button id="download-all-button">
+                    Descargar todo
+                </button>
+
+            </div>
 
         </section>
 
+        <section id="gallery">
+            <p>Cargando galería...</p>
+        </section>
+        <div id="lightbox" class="lightbox">
+
+            <button id="lightbox-close" class="lightbox-close">
+                ×
+            </button>
+
+            <img
+                id="lightbox-image"
+                class="lightbox-image"
+                src=""
+                alt=""
+            >
+
+        </div>
     </main>
 
     <script src="/js/gallery.js"></script>
