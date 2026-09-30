@@ -278,6 +278,80 @@ body.lightbox-open {
     overflow: hidden;
 }
 
+.lightbox-arrow {
+    position: absolute;
+
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 50px;
+    height: 50px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    color: white;
+
+    font-size: 42px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1001;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.lightbox-arrow:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.lightbox-prev {
+    left: 25px;
+}
+
+.lightbox-next {
+    right: 25px;
+}
+
+@media (max-width: 600px) {
+
+    .lightbox-arrow {
+        width: 42px;
+        height: 42px;
+
+        font-size: 34px;
+
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .lightbox-prev {
+        left: 10px;
+    }
+
+    .lightbox-next {
+        right: 10px;
+    }
+
+}
+
+.lightbox-arrow:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.lightbox-arrow:disabled:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
 @media (max-width: 600px) {
 
     .gallery-actions {

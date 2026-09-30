@@ -7,17 +7,77 @@ const lightboxImage =
 const lightboxClose =
     document.getElementById('lightbox-close');
 
+const lightboxPrev =
+    document.getElementById('lightbox-prev');
 
-function openLightbox(imageUrl, imageName) {
+const lightboxNext =
+    document.getElementById('lightbox-next');
 
-    lightboxImage.src = imageUrl;
-    lightboxImage.alt = imageName;
+let galleryImages = [];
+
+let currentImageIndex = 0;
+
+function openLightbox(index) {
+
+    currentImageIndex = index;
+
+    updateLightbox();
 
     lightbox.classList.add('active');
 
     document.body.classList.add('lightbox-open');
 }
 
+function updateLightbox() {
+
+    const image =
+        galleryImages[currentImageIndex];
+
+    if (!image) {
+        return;
+    }
+
+    lightboxImage.src =
+        image.url;
+
+    lightboxImage.alt =
+        image.name;
+
+    lightboxPrev.disabled =
+        currentImageIndex === 0;
+
+    lightboxNext.disabled =
+        currentImageIndex === galleryImages.length - 1;
+
+}
+
+function showPreviousImage() {
+
+    if (currentImageIndex > 0) {
+
+        currentImageIndex--;
+
+        updateLightbox();
+
+    }
+
+}
+
+
+function showNextImage() {
+
+    if (
+        currentImageIndex <
+        galleryImages.length - 1
+    ) {
+
+        currentImageIndex++;
+
+        updateLightbox();
+
+    }
+
+}
 
 function closeLightbox() {
 
@@ -34,6 +94,15 @@ lightboxClose.addEventListener(
     closeLightbox
 );
 
+lightboxPrev.addEventListener(
+    'click',
+    showPreviousImage
+);
+
+lightboxNext.addEventListener(
+    'click',
+    showNextImage
+);
 
 lightbox.addEventListener(
     'click',
@@ -51,8 +120,26 @@ document.addEventListener(
     'keydown',
     (event) => {
 
+        if (!lightbox.classList.contains('active')) {
+            return;
+        }
+
         if (event.key === 'Escape') {
+
             closeLightbox();
+
+        }
+
+        else if (event.key === 'ArrowLeft') {
+
+            showPreviousImage();
+
+        }
+
+        else if (event.key === 'ArrowRight') {
+
+            showNextImage();
+
         }
 
     }
@@ -141,6 +228,16 @@ async function loadGallery() {
         }
 
         const album = data.album;
+
+        galleryImages =
+            album.files
+                .filter(file =>
+                    file.mime_type.startsWith('image/')
+                )
+                .map(file => ({
+                    url: `/uploads/${file.stored_name}`,
+                    name: file.original_name
+                }));
 
         albumName.textContent = album.name;
 
@@ -270,7 +367,7 @@ async function loadGallery() {
             }
 
             gallery.appendChild(fileElement);
-            
+
             const image =
                 fileElement.querySelector('.gallery-image');
 
@@ -280,10 +377,17 @@ async function loadGallery() {
                     'click',
                     () => {
 
-                        openLightbox(
-                            fileUrl,
-                            file.original_name
-                        );
+                        const imageIndex =
+                            galleryImages.findIndex(
+                                galleryImage =>
+                                    galleryImage.url === fileUrl
+                            );
+
+                        if (imageIndex !== -1) {
+
+                            openLightbox(imageIndex);
+
+                        }
 
                     }
                 );
