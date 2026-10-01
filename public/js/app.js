@@ -40,17 +40,46 @@ async function loadAlbums() {
             albumElement.classList.add('album');
 
             albumElement.innerHTML = `
-                <h3>${album.name}</h3>
+                <div class="album-label">
+                    ALBUM
+                </div>
 
-                <p>
-                    Creado:
-                    ${new Date(album.created_at).toLocaleString('es-ES')}
-                </p>
+                <div class="album-content">
 
-                <p>
-                    Token:
-                    ${album.token}
-                </p>
+                    <h3>${album.name}</h3>
+
+                    <div class="album-details">
+
+                        <p>
+                            Creado ·
+                            ${new Date(album.created_at).toLocaleDateString('es-ES')}
+                        </p>
+
+                        <p class="album-token">
+                            ${album.token}
+                        </p>
+
+                    </div>
+
+                    <div class="album-actions">
+
+                        <button
+                            class="copy-link-button"
+                            data-token="${album.token}"
+                        >
+                            Copiar enlace
+                        </button>
+
+                        <button
+                            class="view-album-button"
+                            data-token="${album.token}"
+                        >
+                            Ver álbum ↗
+                        </button>
+
+                    </div>
+
+                </div>
             `;
 
             albumsList.appendChild(albumElement);
@@ -264,3 +293,70 @@ loadAlbumSelect();
 // ==========================================
 
 loadAlbums();
+
+document.addEventListener('click', async (event) => {
+
+    const viewButton =
+        event.target.closest('.view-album-button');
+
+    if (viewButton) {
+
+        const token =
+            viewButton.dataset.token;
+
+        const link =
+            `${window.location.origin}/a/${token}`;
+
+        window.open(link, '_blank');
+
+        return;
+    }
+
+
+    const copyButton =
+        event.target.closest('.copy-link-button');
+
+    if (!copyButton) {
+        return;
+    }
+
+    const token =
+        copyButton.dataset.token;
+
+    const link =
+        `${window.location.origin}/a/${token}`;
+
+    try {
+
+        await navigator.clipboard.writeText(link);
+
+        const originalText =
+            copyButton.textContent;
+
+        copyButton.textContent =
+            '¡Enlace copiado!';
+
+        setTimeout(() => {
+
+            copyButton.textContent =
+                originalText;
+
+        }, 1800);
+
+    } catch (error) {
+
+        console.error(error);
+
+        copyButton.textContent =
+            'No se pudo copiar';
+
+        setTimeout(() => {
+
+            copyButton.textContent =
+                'Copiar enlace';
+
+        }, 1800);
+
+    }
+
+});

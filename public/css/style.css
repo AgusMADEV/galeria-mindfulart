@@ -157,11 +157,11 @@ h2 {
 
     padding: 14px 16px;
 
-    border: 1px solid var(--cream);
+    border: 1px solid var(--magenta);
 
     border-radius: 0;
 
-    background: #ffb1e1;
+    background: var(--cream);
 
     color: var(--magenta);
 
@@ -250,11 +250,11 @@ button:active {
 #album-select {
     padding: 14px 16px;
 
-    border: 1px solid var(--cream);
+    border: 1px solid var(--magenta);
 
     border-radius: 0;
 
-    background: #ffb1e1;
+    background: var(--cream);
 
     color: var(--magenta);
 
@@ -276,7 +276,7 @@ button:active {
 
     border: 1px dashed var(--magenta);
 
-    background: var(--cream);
+    background: var(--white);
 
     font-family: 'Gluten', sans-serif;
 
@@ -325,47 +325,233 @@ button:active {
    ÁLBUMES
 ========================= */
 
+#albums-list {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 28px 22px;
+
+    align-items: start;
+}
+
+
+/* TARJETA */
+
 .album {
     position: relative;
 
+    min-height: 190px;
+
+    padding: 0;
+
+    margin: 0;
+
     background: var(--white);
 
-    padding: 22px;
+    border: none;
 
-    margin-bottom: 22px;
+    box-shadow:
+        0 5px 14px rgba(23, 23, 23, 0.08);
 
-    border: 1px solid #e1ded2;
+    overflow: visible;
 
-    box-shadow: 0 3px 10px rgba(23, 23, 23, 0.05);
-
-    transform: rotate(-0.5deg);
+    transform: rotate(-0.7deg);
 }
 
-.album:nth-child(even) {
-    transform: rotate(0.6deg);
+
+/* ROTACIONES */
+
+.album:nth-child(2n) {
+    transform: rotate(0.8deg);
 }
 
 .album:nth-child(3n) {
-    transform: rotate(-0.25deg);
+    transform: rotate(-0.3deg);
 }
+
+.album:nth-child(5n) {
+    transform: rotate(0.5deg);
+}
+
+
+/* BANDA SUPERIOR */
+
+.album::before {
+    content: "";
+
+    position: absolute;
+
+    width: 55px;
+    height: 12px;
+
+    background: var(--magenta);
+
+    top: -6px;
+    left: 42%;
+
+    transform: rotate(-2deg);
+
+    opacity: 0.7;
+}
+
+
+/* ETIQUETA */
+
+.album-label {
+    position: absolute;
+
+    top: 28px;
+    right: 22px;
+
+    font-size: 10px;
+
+    letter-spacing: 1.5px;
+
+    color: var(--magenta);
+
+    transform: rotate(2deg);
+}
+
+
+/* CONTENIDO */
+
+.album-content {
+    padding: 55px 25px 25px;
+}
+
+
+/* NOMBRE */
 
 .album h3 {
     font-family: 'DM Serif Display', serif;
 
-    font-size: 25px;
+    font-size: clamp(25px, 3vw, 34px);
+
     font-weight: 400;
 
-    margin-bottom: 9px;
+    line-height: 1.05;
+
+    color: var(--black);
+
+    margin: 0 35px 25px 0;
 }
 
-.album p {
+
+/* INFORMACIÓN */
+
+.album-details {
+    border-top: 1px solid #e8e4d8;
+
+    padding-top: 13px;
+}
+
+.album-details p {
     color: var(--grey);
 
-    font-size: 13px;
+    font-size: 12px;
 
-    margin-top: 5px;
+    line-height: 1.5;
+
+    margin: 0;
 }
 
+
+/* TOKEN */
+
+.album-details .album-token {
+    margin-top: 8px;
+
+    font-size: 9px;
+
+    letter-spacing: 0.4px;
+
+    color: #aaa59f;
+
+    word-break: break-all;
+}
+
+.album-actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 18px;
+
+    flex-wrap: wrap;
+}
+
+.copy-link-button,
+.view-album-button {
+    padding: 9px 14px;
+
+    font-family: 'Gluten', sans-serif;
+
+    font-size: 11px;
+
+    border: none;
+
+    border-radius: 2px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+/* COPIAR */
+
+.copy-link-button {
+    background: var(--magenta);
+
+    color: var(--cream);
+}
+
+
+/* VER ÁLBUM */
+
+.view-album-button {
+    background: var(--cream);
+
+    color: var(--magenta);
+}
+
+
+/* HOVER */
+
+.copy-link-button:hover,
+.view-album-button:hover {
+    background: var(--pink);
+    transform: translateY(-1px);
+}
+.copy-link-button:hover{
+    color: var(--magenta);
+
+}
+.view-album-button:hover{
+    color: var(--cream);
+
+}
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+    #albums-list {
+        grid-template-columns: 1fr;
+
+        gap: 22px;
+    }
+
+    .album {
+        min-height: 175px;
+    }
+
+}
 
 /* =========================
    RESPONSIVE
