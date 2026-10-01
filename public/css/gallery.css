@@ -11,6 +11,7 @@
     --black: #171717;
     --white: #FFFFFF;
     --grey: #77716f;
+    --magenta: #cf498a;
 }
 
 
@@ -101,7 +102,7 @@ body {
     font-size: clamp(48px, 7vw, 82px);
 
     font-weight: 400;
-
+    color: var(--cream);
     line-height: 0.9;
 
     letter-spacing: -1px;
@@ -229,9 +230,9 @@ body {
 #gallery {
     display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
 
-    gap: 28px 18px;
+    gap: 28px 20px;
 
     align-items: start;
 }
@@ -293,7 +294,7 @@ body {
 /* =========================================================
    EDITORIAL GRID
    ========================================================= */
-
+/*
 .media-card:nth-child(5n + 1) {
     grid-column: span 2;
 }
@@ -302,7 +303,7 @@ body {
 .media-card:nth-child(5n + 1) video {
     aspect-ratio: 16 / 10;
 }
-
+*/
 /* =========================================================
    MEDIA
    ========================================================= */
@@ -312,14 +313,12 @@ body {
     display: block;
 
     width: 100%;
+    height: auto;
 
-    aspect-ratio: 1 / 1;
+    object-fit: contain;
 
-    object-fit: cover;
-
-    background: #f4f4e9;
+    background: var(--cream);
 }
-
 
 .gallery-image {
     cursor: pointer;
@@ -684,15 +683,15 @@ body.lightbox-open {
     .gallery-header h1 {
         font-size: clamp(45px, 9vw, 65px);
     }
-
+/*
     .media-card:nth-child(5n + 1) {
         grid-column: span 2;
     }
-
+        
     .media-card:nth-child(5n + 1) img,
     .media-card:nth-child(5n + 1) video {
         aspect-ratio: 16 / 10;
-    }
+    }*/
 
 }
 
