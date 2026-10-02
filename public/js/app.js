@@ -63,7 +63,7 @@ async function loadAlbums() {
 
                 <div class="album-content">
 
-                    <h3>${album.name}</h3>
+                    <h3 class="album-title">${album.name}</h3>
 
                     <div class="album-details">
 
@@ -478,19 +478,26 @@ document.addEventListener('click', async (event) => {
 
     if (editButton) {
 
-        const albumId =
-            editButton.dataset.id;
-
         const album =
             editButton.closest('.album');
 
         const title =
-            album.querySelector('h3');
+            album.querySelector('.album-title');
 
         const originalName =
             title.textContent.trim();
 
-        title.innerHTML = `
+        const editContainer =
+            document.createElement('div');
+
+        editContainer.className =
+            'album-edit';
+
+        editContainer.innerHTML = `
+            <span class="album-edit-label">
+                EDITAR NOMBRE
+            </span>
+
             <input
                 type="text"
                 class="edit-album-input"
@@ -516,8 +523,10 @@ document.addEventListener('click', async (event) => {
             </div>
         `;
 
+        title.replaceWith(editContainer);
+
         const input =
-            title.querySelector('.edit-album-input');
+            editContainer.querySelector('.edit-album-input');
 
         input.focus();
         input.select();
