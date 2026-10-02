@@ -62,26 +62,116 @@ const upload = multer({
 
 // Obtener todos los álbumes
 router.get('/albums', async (req, res) => {
+
     try {
+
         const [albums] = await db.query(`
-            SELECT *
-            FROM albums
-            ORDER BY created_at DESC
+            SELECT
+                a.*,
+
+                COUNT(f.id) AS file_count,
+
+                GROUP_CONCAT(
+                    CASE
+                        WHEN f.mime_type LIKE 'image/%'
+                        THEN f.stored_name
+                    END
+                    ORDER BY f.created_at ASC
+                    SEPARATOR ','
+                ) AS preview_images
+
+            FROM albums a
+
+            LEFT JOIN files f
+                ON f.album_id = a.id
+
+            GROUP BY a.id
+
+            ORDER BY a.created_at DESC
         `);
+
+        const formattedAlbums = albums.map(album => {
+
+            const previewImages = album.preview_images
+                ? album.preview_images.split(',').slice(0, 3)
+                : [];
+
+            return {
+                ...album,
+                file_count: Number(album.file_count),
+                preview_images: previewImages
+            };
+
+        });
 
         res.json({
             success: true,
-            albums
+            albums: formattedAlbums
         });
 
     } catch (error) {
+
         console.error(error);
 
         res.status(500).json({
             success: false,
             message: 'Error al obtener los álbumes'
         });
+
     }
+
+});
+
+router.put('/albums/:id', async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+        const { name } = req.body;
+
+        const cleanName = name?.trim();
+
+        if (!cleanName) {
+
+            return res.status(400).json({
+                success: false,
+                message: 'El nombre del álbum no puede estar vacío'
+            });
+
+        }
+
+        const [result] = await db.query(
+            `UPDATE albums
+             SET name = ?
+             WHERE id = ?`,
+            [cleanName, id]
+        );
+
+        if (result.affectedRows === 0) {
+
+            return res.status(404).json({
+                success: false,
+                message: 'Álbum no encontrado'
+            });
+
+        }
+
+        res.json({
+            success: true,
+            message: 'Álbum actualizado correctamente'
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: 'Error al actualizar el álbum'
+        });
+
+    }
+
 });
 
 // Crear un nuevo álbum
