@@ -770,7 +770,7 @@ button:active {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 9px;
-    padding: 48px 14px 0;
+    padding: 60px 14px 0;
 }
 
 .album-preview {

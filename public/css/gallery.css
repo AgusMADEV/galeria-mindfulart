@@ -228,13 +228,9 @@ body {
    ========================================================= */
 
 #gallery {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 28px 20px;
-
-    align-items: start;
+    position: relative;
+    column-count: 3;
+    column-gap: 20px;
 }
 
 
@@ -244,7 +240,8 @@ body {
 
 .media-card {
     position: relative;
-
+    break-inside: avoid;
+    margin-bottom: 28px;
     overflow: visible;
 
     background: var(--white);
@@ -400,10 +397,10 @@ body {
 .file-select {
     position: absolute;
 
-    top: -5px;
+    top: 0px;
     right: -5px;
 
-    z-index: 10;
+    z-index: 50;
 
     width: 32px;
     height: 32px;
@@ -669,10 +666,10 @@ body.lightbox-open {
 
 
     #gallery {
-        grid-template-columns: repeat(2, 1fr);
 
-        gap: 20px 12px;
-    }
+    column-count: 2;
+    column-gap: 12px;
+}
 
 
     .gallery-header {
@@ -862,10 +859,8 @@ body.lightbox-open {
 @media (max-width: 450px) {
 
     #gallery {
-        grid-template-columns: 1fr;
-
-        gap: 20px;
-    }
+        column-count: 1;
+    }  
 
 
     .media-card:nth-child(3n + 1),
